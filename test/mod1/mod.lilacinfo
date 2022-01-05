@@ -1,0 +1,16 @@
+[target-version: 1]
+
+[version] v1.0.0
+[id] "com.lilac.test_one"
+[name] "Lilac Test 1"
+[developer] "Lilac Team"
+[description] "Test Mod #1"
+[details] "Test Mod #1 for making sure hooking, loading and sharing interfaces works."
+[credits] none
+[dependencies] none
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>¨
+<plist version="1.0">
+	<k>lilac</k><i>1</i>
+	<k>info</k>
+	<d>
+		<k>version</k><s>v1.0.0</s>
+		<k>id</k><s>com.lilac.test_one</s>
+		<k>name</k><s>Lilac Test 1</s>
+		<k>developer</k><s>Lilac Team</s>
+		<k>description</k><s>Test Mod #1</s>
+		<k>details</k><s>Test Mod #1 for making sure hooking, loading and sharing interfaces works.</s>
+	</d>
+</plist>
+
+
