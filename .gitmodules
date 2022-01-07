@@ -1,6 +1,3 @@
 [submodule "submodules/lib"]
 	path = submodules/lib
 	url = https://github.com/lilac-sdk/lib
-[submodule "submodules/zipper"]
-	path = submodules/zipper
-	url = https://github.com/sebastiandev/zipper
