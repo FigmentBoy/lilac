@@ -3,7 +3,7 @@
 #include "../keybinds/Keybind.hpp"
 #include "../keybinds/KeybindAction.hpp"
 #include "macros.hpp"
-#include "Types.hpp"
+#include "types.hpp"
 #include <utils/Result.hpp>
 #include <utils/VersionInfo.hpp>
 #include <string_view>
@@ -25,8 +25,10 @@ namespace lilac {
 
     struct Dependency {
         std::string_view m_id;
+        // todo: Dynamic versions (1.*.*)
         VersionInfo m_version { 1, 0, 0 };
-        bool m_required;
+        ModResolveState m_state = ModResolveState::Unloaded;
+        bool m_required = false;
         Mod* m_loaded = nullptr;
     };
 

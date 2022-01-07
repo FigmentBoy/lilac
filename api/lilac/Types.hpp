@@ -170,6 +170,22 @@ namespace lilac {
 		const char* credits;
 	};
 
+    /**
+     * Represents if a mod has been loaded & 
+     * its dependencies resolved
+     */
+    enum class ModResolveState {
+        // Mod has not been loaded at all
+        Unloaded,
+        // Mod has unresolved dependencies
+        Unresolved,
+        // Mod has all dependencies resolved, 
+        // but is not loaded yet
+        Resolved,
+        // Mod is loaded
+        Loaded,
+    };
+
 	/**
 	 * Default Lilac load method for C++ 
 	 * mods: The mod creates an instance 

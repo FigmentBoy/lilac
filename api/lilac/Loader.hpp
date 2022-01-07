@@ -24,29 +24,6 @@ namespace lilac {
     class LogMessage;
     struct UnresolvedMod;
 
-    /**
-     * Describes if a mod has been resolved, 
-     * i.e. its dependencies have been loaded.
-     */
-    enum class ModResolveState {
-        /**
-         * Some dependencies are not loaded 
-         * at all
-         */
-        SomeMissing,
-        /**
-         * Some dependencies are loaded, 
-         * but haven't been resolved 
-         * themselves
-         */
-        SomeUnresolved,
-        /**
-         * All dependencies are loaded & 
-         * their dependencies resolved
-         */
-        AllResolved,
-    };
-
     class LILAC_DLL Loader {
         protected:
             std::vector<Mod*> m_mods;
@@ -78,8 +55,8 @@ namespace lilac {
             Loader();
             virtual ~Loader();
             
-            Result<> loadModFromFile(std::string const& file);
-            Result<Mod*> checkMetaInformation(std::string const& file);
+            Result<Mod*> loadModFromFile(std::string const& file);
+            Result<bool> checkMetaInformation(std::string const& file);
             void createDirectories();
 
             friend class Mod;

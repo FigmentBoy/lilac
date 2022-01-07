@@ -14,8 +14,6 @@ add_library(lilac_loader SHARED ${SOURCES})
 set_target_properties(lilac_loader PROPERTIES PREFIX "" OUTPUT_NAME "lilac")
 
 add_subdirectory(submodules/lib)
-set(BUILD_TEST Off CACHE BOOL "Build the test program." FORCE)
-add_subdirectory(submodules/zipper)
 
 target_link_libraries(
 	lilac_loader

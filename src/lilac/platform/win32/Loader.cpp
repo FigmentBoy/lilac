@@ -47,10 +47,13 @@ Mod* loadWithCApi(HMODULE load) {
     return nullptr;
 }
 
-Result<> Loader::loadModFromFile(std::string const& path) {
+Result<Mod*> Loader::loadModFromFile(std::string const& path) {
     auto check = this->checkMetaInformation(path);
     if (!check) {
         return check;
+    }
+    if (!check.value()) {
+        return Ok<Mod*>(nullptr);
     }
     auto load = LoadLibraryA(path.c_str());
     if (load) {
@@ -69,7 +72,7 @@ Result<> Loader::loadModFromFile(std::string const& path) {
             mod->m_platformInfo = new PlatformInfo { load };
             mod->m_path = path.c_str();
             this->m_mods.push_back(mod);
-            return Ok<>();
+            return Ok<Mod*>(mod);
         } else {
             return Err<>("Unable to find load functions within " + path);
         }

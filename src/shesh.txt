@@ -28,5 +28,5 @@ ${workspaceFolder}/submodules/lib/include/cocos2dx/platform/win32
 ${workspaceFolder}/submodules/lib/include/fmod/inc
 ${workspaceFolder}/submodules/lib/include/extensions
 ${workspaceFolder}/submodules/lib/include
-${workspaceFolder}/submodules/zipper/zipper
 ${workspaceFolder}/submodules/json
+${workspaceFolder}/submodules/lib/include/cocos2dx/support/zip_support
