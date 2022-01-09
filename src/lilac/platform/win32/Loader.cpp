@@ -52,7 +52,7 @@ Result<Mod*> Loader::loadModFromFile(std::string const& path) {
     if (!check) {
         return check;
     }
-    if (!check.value()) {
+    if (!check.value().resolved) {
         return Ok<Mod*>(nullptr);
     }
     auto load = LoadLibraryA(path.c_str());
@@ -70,7 +70,7 @@ Result<Mod*> Loader::loadModFromFile(std::string const& path) {
             mod->setup();
             mod->m_enabled = true;
             mod->m_platformInfo = new PlatformInfo { load };
-            mod->m_path = path.c_str();
+            mod->m_info = check.value().info;
             this->m_mods.push_back(mod);
             return Ok<Mod*>(mod);
         } else {

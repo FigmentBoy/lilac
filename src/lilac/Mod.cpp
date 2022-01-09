@@ -7,7 +7,7 @@
 
 USE_LILAC_NAMESPACE();
 
-Mod::Mod() : m_version(1, 0, 0) {}
+Mod::Mod() {}
 
 Mod::~Mod() {
     this->platformCleanup();
@@ -39,36 +39,36 @@ void Mod::enableBase() {
     this->enable();
 }
 
-decltype(Mod::m_id) Mod::getID() const {
-    return this->m_id;
+decltype(ModInfo::m_id) Mod::getID() const {
+    return this->m_info.m_id;
 }
 
-decltype(Mod::m_name) Mod::getName() const {
-    return this->m_name;
+decltype(ModInfo::m_name) Mod::getName() const {
+    return this->m_info.m_name;
 }
 
-decltype(Mod::m_developer) Mod::getDeveloper() const {
-    return this->m_developer;
+decltype(ModInfo::m_developer) Mod::getDeveloper() const {
+    return this->m_info.m_developer;
 }
 
-decltype(Mod::m_credits) Mod::getCredits() const {
-    return this->m_credits;
+decltype(ModInfo::m_credits) Mod::getCredits() const {
+    return this->m_info.m_credits;
 }
 
-decltype(Mod::m_description) Mod::getDescription() const {
-    return this->m_description;
+decltype(ModInfo::m_description) Mod::getDescription() const {
+    return this->m_info.m_description;
 }
 
-decltype(Mod::m_details) Mod::getDetails() const {
-    return this->m_details;
+decltype(ModInfo::m_details) Mod::getDetails() const {
+    return this->m_info.m_details;
 }
 
-decltype(Mod::m_path) Mod::getPath() const {
+decltype(ModBase::m_path) Mod::getPath() const {
     return this->m_path;
 }
 
 VersionInfo Mod::getVersion() const {
-    return this->m_version;
+    return this->m_info.m_version;
 }
 
 bool Mod::isEnabled() const {
@@ -114,14 +114,14 @@ bool Mod::depends(std::string_view const& id) const {
 
 bool ModBase::depends(std::string_view const& id) const {
     return vector_utils::contains<Dependency>(
-        this->m_dependencies,
+        this->m_info.m_dependencies,
         [id](Dependency t) -> bool { return t.m_id == id; }
     );
 }
 
 bool ModBase::hasUnresolvedDependencies() const {
     return vector_utils::contains<Dependency>(
-        this->m_dependencies,
+        this->m_info.m_dependencies,
         [](Dependency t) -> bool { return t.m_required && !t.m_loaded; }
     );
 }

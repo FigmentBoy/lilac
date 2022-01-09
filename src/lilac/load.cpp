@@ -9,7 +9,7 @@
 
 USE_LILAC_NAMESPACE();
 
-Result<bool> Loader::checkMetaInformation(std::string const& path) {
+Result<Loader::MetaCheckResult> Loader::checkMetaInformation(std::string const& path) {
     // Unzip file
     auto unzip = ZipFile::ZipFile(path);
     if (!unzip.isLoaded()) {
@@ -60,50 +60,7 @@ Result<bool> Loader::checkMetaInformation(std::string const& path) {
     
     // Handle mod.json data based on target
     switch (schema) {
-        case 1: {
-            if (!json.contains("id")) {
-                return Err<>("\"" + path + "\" lacks a Mod ID");
-            }
-            if (json.contains("dependencies")) {
-                auto deps = json["dependencies"];
-                if (deps.is_array()) {
-                    auto mod = new UnresolvedMod;
-                    mod->m_id = json["id"];
-                    mod->m_path = path;
-
-                    for (auto const& dep : deps) {
-                        if (dep.is_object() && dep.contains("id") && dep["id"].is_string()) {
-                            auto depobj = Dependency {};
-                            depobj.m_id = dep["id"];
-                            if (dep.contains("version")) {
-                                depobj.m_version = VersionInfo(dep["version"]);
-                            }
-                            if (dep.contains("required")) {
-                                depobj.m_required = dep["required"];
-                            }
-                            depobj.m_loaded = this->getLoadedMod(depobj.m_id);
-                            if (depobj.m_loaded) {
-                                auto u = vector_utils::select<UnresolvedMod*>(
-                                    this->m_unresolvedMods,
-                                    [depobj](UnresolvedMod* t) -> bool {
-                                        return t->m_id == depobj.m_id;
-                                    }
-                                );
-                                if (u) {
-                                    depobj.m_state =
-                                        u->hasUnresolvedDependencies() ?
-                                            ModResolveState::Unloaded : 
-                                            ModResolveState::Resolved;
-                                }
-                            }
-                        }
-                    }
-
-                    this->m_unresolvedMods.push_back(mod);
-                }
-            }
-            return Ok<bool>(true);
-        } break;
+        case 1: return this->checkBySchema<1>(path, &json);
     }
 
     // Target version was not handled
@@ -114,4 +71,51 @@ Result<bool> Loader::checkMetaInformation(std::string const& path) {
         "This may be a bug, or the given version "
         "schema is invalid."
     );
+}
+
+template<>
+Result<Loader::MetaCheckResult> Loader::checkBySchema<1>(std::string const& path, void* jsonData) {
+    nlohmann::json json = *reinterpret_cast<nlohmann::json*>(jsonData);
+    if (!json.contains("id")) {
+        return Err<>("\"" + path + "\" lacks a Mod ID");
+    }
+
+    ModInfo info;
+
+    info.m_path          = path;
+    info.m_version       = VersionInfo(json["version"]);
+    info.m_id            = json["id"];
+    info.m_name          = json["name"];
+    info.m_developer     = json["developer"];
+    info.m_description   = json["description"];
+    info.m_details       = json["details"];
+    info.m_credits       = json["credits"];
+
+    bool resolved = false;
+    if (json.contains("dependencies")) {
+        auto deps = json["dependencies"];
+        if (deps.is_array()) {
+            for (auto const& dep : deps) {
+                if (dep.is_object() && dep.contains("id") && dep["id"].is_string()) {
+                    auto depobj = Dependency {};
+                    depobj.m_id = dep["id"];
+                    if (dep.contains("version")) {
+                        depobj.m_version = VersionInfo(dep["version"]);
+                    }
+                    if (dep.contains("required")) {
+                        depobj.m_required = dep["required"];
+                    }
+                    depobj.m_loaded = this->getLoadedMod(depobj.m_id);
+                }
+            }
+        }
+    }
+
+    if (!resolved) {
+        auto mod = new UnresolvedMod;
+        mod->m_info = info;
+        this->m_unresolvedMods.push_back(mod);
+    }
+
+    return Ok<MetaCheckResult>({ info, resolved });
 }

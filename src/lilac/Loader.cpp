@@ -60,7 +60,7 @@ bool Loader::isModLoaded(std::string_view const& id) {
     return vector_utils::contains<Mod*>(
         this->m_mods,
         [id](Mod* p) -> bool {
-            return p->m_id == id;
+            return p->m_info.m_id == id;
         }
     );
 }
@@ -69,7 +69,7 @@ Mod* Loader::getLoadedMod(std::string_view const& id) {
     return vector_utils::select<Mod*>(
         this->m_mods,
         [id](Mod* p) -> bool {
-            return p->m_id == id;
+            return p->m_info.m_id == id;
         }
     );
 }

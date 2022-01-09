@@ -23,64 +23,87 @@ namespace lilac {
     class LogStream;
     class LogMessage;
     struct UnresolvedMod;
+    struct ModInfo;
 
     class LILAC_DLL Loader {
-        protected:
-            std::vector<Mod*> m_mods;
-            std::vector<LogMessage*> m_logs;
-            std::unordered_map<std::string, ModResolveState> m_resolveStates;
-            std::vector<UnresolvedMod*> m_unresolvedMods;
-            LogStream* m_logStream;
-            bool m_isSetup = false;
+    protected:
+        std::vector<Mod*> m_mods;
+        std::vector<LogMessage*> m_logs;
+        std::unordered_map<std::string, ModResolveState> m_resolveStates;
+        std::vector<UnresolvedMod*> m_unresolvedMods;
+        LogStream* m_logStream;
+        bool m_isSetup = false;
 
-            /**
-             * Lowest supported mod version.
-             * Any mod targeting a lilac version 
-             * lower than this will not be loaded, 
-             * as they will be considered out-of-date.
-             */
-            static constexpr const int s_supportedSchemaMin = 1;
-            /**
-             * Highest support mod version.
-             * Any mod targeting a lilac version 
-             * higher than this will not be loaded, 
-             * as a higher version means that 
-             * the user's lilac is out-of-date, 
-             * or that the user is a time traveller 
-             * and has downloaded a mod from the 
-             * future.
-             */
-            static constexpr const int s_supportedSchemaMax = 1;
+        /**
+         * Lowest supported mod version.
+         * Any mod targeting a lilac version 
+         * lower than this will not be loaded, 
+         * as they will be considered out-of-date.
+         */
+        static constexpr const int s_supportedSchemaMin = 1;
+        /**
+         * Highest support mod version.
+         * Any mod targeting a lilac version 
+         * higher than this will not be loaded, 
+         * as a higher version means that 
+         * the user's lilac is out-of-date, 
+         * or that the user is a time traveller 
+         * and has downloaded a mod from the 
+         * future.
+         */
+        static constexpr const int s_supportedSchemaMax = 1;
 
-            Loader();
-            virtual ~Loader();
-            
-            Result<Mod*> loadModFromFile(std::string const& file);
-            Result<bool> checkMetaInformation(std::string const& file);
-            void createDirectories();
+        Loader();
+        virtual ~Loader();
 
-            friend class Mod;
-            friend class CustomLoader;
-            friend class Lilac;
-            
-        public:
-            static Loader* get();
-            bool setup();
-            size_t updateMods();
+        struct MetaCheckResult {
+            ModInfo info;
+            bool resolved;
+        };
+        
+        /**
+         * This function is to avoid ridiculous 
+         * indentation in `checkMetaInformation`
+         * 
+         * The json parameter is void* because 
+         * I don't want to force-include json 
+         * for every lilac user and forward-
+         * declaring the template-full basic_json 
+         * class looks horrifying
+         * 
+         * This function is only used in one place 
+         * anyway, only by me who knows how to 
+         * use it, so who cares
+         */
+        template<int Schema>
+        Result<MetaCheckResult> checkBySchema(std::string const& path, void* json);
 
-            LogStream& logStream();
-            void log(LogMessage* log);
-            void deleteLog(LogMessage* log);
-            std::vector<LogMessage*> const& getLogs() const;
-            std::vector<LogMessage*> getLogs(
-                std::initializer_list<Severity> severityFilter
-            );
-    
-            bool isModLoaded(std::string_view const& id);
-            Mod* getLoadedMod(std::string_view const& id);
-            std::vector<Mod*> getLoadedMods();
-            void unloadMod(Mod* mod);
-            bool isCustomLoaderLoaded(std::string_view const& id);
+        Result<Mod*> loadModFromFile(std::string const& file);
+        Result<MetaCheckResult> checkMetaInformation(std::string const& file);
+        void createDirectories();
+
+        friend class Mod;
+        friend class CustomLoader;
+        friend class Lilac;
+        
+    public:
+        static Loader* get();
+        bool setup();
+        size_t updateMods();
+
+        LogStream& logStream();
+        void log(LogMessage* log);
+        void deleteLog(LogMessage* log);
+        std::vector<LogMessage*> const& getLogs() const;
+        std::vector<LogMessage*> getLogs(
+            std::initializer_list<Severity> severityFilter
+        );
+
+        bool isModLoaded(std::string_view const& id);
+        Mod* getLoadedMod(std::string_view const& id);
+        std::vector<Mod*> getLoadedMods();
+        void unloadMod(Mod* mod);
+        bool isCustomLoaderLoaded(std::string_view const& id);
     };
 
 }
