@@ -26,6 +26,7 @@ void Mod::disableBase() {
         this->disableHook(hook);
     }
     this->disable();
+    Loader::get()->updateAllDependencies();
 }
 
 void Mod::enableBase() {
@@ -37,6 +38,7 @@ void Mod::enableBase() {
         this->enableHook(hook);
     }
     this->enable();
+    Loader::get()->updateAllDependencies();
 }
 
 decltype(ModInfo::m_id) Mod::getID() const {
@@ -63,8 +65,8 @@ decltype(ModInfo::m_details) Mod::getDetails() const {
     return this->m_info.m_details;
 }
 
-decltype(ModBase::m_path) Mod::getPath() const {
-    return this->m_path;
+decltype(ModInfo::m_path) Mod::getPath() const {
+    return this->m_info.m_path;
 }
 
 VersionInfo Mod::getVersion() const {

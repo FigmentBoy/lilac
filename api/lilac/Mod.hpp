@@ -22,14 +22,17 @@ namespace lilac {
     class Hook;
     class Loader;
     class LogStream;
+    class Mod;
+    struct UnresolvedMod;
 
     struct Dependency {
-        std::string_view m_id;
+        std::string m_id;
         // todo: Dynamic versions (1.*.*)
         VersionInfo m_version { 1, 0, 0 };
         ModResolveState m_state = ModResolveState::Unloaded;
         bool m_required = false;
         Mod* m_loaded = nullptr;
+        UnresolvedMod* m_unresolved = nullptr;
     };
 
     struct LILAC_DLL ModInfo {
@@ -89,6 +92,8 @@ namespace lilac {
          * Dependencies
          */
         std::vector<Dependency> m_dependencies;
+        bool hasUnresolvedDependencies() const;
+        void updateDependencyStates();
     };
 
     /**
@@ -104,7 +109,6 @@ namespace lilac {
      */
     struct LILAC_DLL UnresolvedMod {
         ModInfo m_info;
-        bool hasUnresolvedDependencies() const;
     };
 
     /**

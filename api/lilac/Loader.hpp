@@ -57,7 +57,7 @@ namespace lilac {
         virtual ~Loader();
 
         struct MetaCheckResult {
-            ModInfo info;
+            std::string id;
             bool resolved;
         };
         
@@ -78,13 +78,17 @@ namespace lilac {
         template<int Schema>
         Result<MetaCheckResult> checkBySchema(std::string const& path, void* json);
 
-        Result<Mod*> loadModFromFile(std::string const& file);
         Result<MetaCheckResult> checkMetaInformation(std::string const& file);
+        Result<Mod*> loadResolvedMod(std::string const& id);
+        Result<Mod*> loadModFromFile(std::string const& file);
         void createDirectories();
+
+        void updateAllDependencies();
 
         friend class Mod;
         friend class CustomLoader;
         friend class Lilac;
+        friend class ModInfo;
         
     public:
         static Loader* get();
@@ -99,11 +103,12 @@ namespace lilac {
             std::initializer_list<Severity> severityFilter
         );
 
-        bool isModLoaded(std::string_view const& id);
-        Mod* getLoadedMod(std::string_view const& id);
-        std::vector<Mod*> getLoadedMods();
+        bool isModLoaded(std::string_view const& id) const;
+        Mod* getLoadedMod(std::string_view const& id) const;
+        UnresolvedMod* getUnresolvedMod(std::string_view const& id) const;
+        std::vector<Mod*> getLoadedMods() const;
+        std::vector<UnresolvedMod*> getUnresolvedMods() const;
         void unloadMod(Mod* mod);
-        bool isCustomLoaderLoaded(std::string_view const& id);
     };
 
 }

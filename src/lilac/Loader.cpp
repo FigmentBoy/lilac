@@ -41,7 +41,7 @@ size_t Loader::updateMods() {
             if (!vector_utils::contains<Mod*>(
                 this->m_mods,
                 [entry](Mod* p) -> bool {
-                    return p->m_path == entry.path().string();
+                    return p->m_info.m_path == entry.path().string();
                 }
             )) {
                 auto res = this->loadModFromFile(entry.path().string());
@@ -56,7 +56,7 @@ size_t Loader::updateMods() {
     return loaded;
 }
 
-bool Loader::isModLoaded(std::string_view const& id) {
+bool Loader::isModLoaded(std::string_view const& id) const {
     return vector_utils::contains<Mod*>(
         this->m_mods,
         [id](Mod* p) -> bool {
@@ -65,7 +65,7 @@ bool Loader::isModLoaded(std::string_view const& id) {
     );
 }
 
-Mod* Loader::getLoadedMod(std::string_view const& id) {
+Mod* Loader::getLoadedMod(std::string_view const& id) const {
     return vector_utils::select<Mod*>(
         this->m_mods,
         [id](Mod* p) -> bool {
@@ -74,8 +74,30 @@ Mod* Loader::getLoadedMod(std::string_view const& id) {
     );
 }
 
-std::vector<Mod*> Loader::getLoadedMods() {
+UnresolvedMod* Loader::getUnresolvedMod(std::string_view const& id) const {
+    return vector_utils::select<UnresolvedMod*>(
+        this->m_unresolvedMods,
+        [id](UnresolvedMod* p) -> bool {
+            return p->m_info.m_id == id;
+        }
+    );
+}
+
+std::vector<Mod*> Loader::getLoadedMods() const {
     return this->m_mods;
+}
+
+std::vector<UnresolvedMod*> Loader::getUnresolvedMods() const {
+    return this->m_unresolvedMods;
+}
+
+void Loader::updateAllDependencies() {
+    for (auto const& mod : this->m_mods) {
+        mod->m_info.updateDependencyStates();
+    }
+    for (auto const& mod : this->m_unresolvedMods) {
+        mod->m_info.updateDependencyStates();
+    }
 }
 
 void Loader::unloadMod(Mod* mod) {

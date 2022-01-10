@@ -91,7 +91,6 @@ Result<Loader::MetaCheckResult> Loader::checkBySchema<1>(std::string const& path
     info.m_details       = json["details"];
     info.m_credits       = json["credits"];
 
-    bool resolved = false;
     if (json.contains("dependencies")) {
         auto deps = json["dependencies"];
         if (deps.is_array()) {
@@ -106,16 +105,18 @@ Result<Loader::MetaCheckResult> Loader::checkBySchema<1>(std::string const& path
                         depobj.m_required = dep["required"];
                     }
                     depobj.m_loaded = this->getLoadedMod(depobj.m_id);
+                    depobj.m_unresolved = this->getUnresolvedMod(depobj.m_id);
+                    info.m_dependencies.push_back(depobj);
                 }
             }
         }
     }
+    info.updateDependencyStates();
+    bool resolved = info.hasUnresolvedDependencies();
 
-    if (!resolved) {
-        auto mod = new UnresolvedMod;
-        mod->m_info = info;
-        this->m_unresolvedMods.push_back(mod);
-    }
+    auto mod = new UnresolvedMod;
+    mod->m_info = info;
+    this->m_unresolvedMods.push_back(mod);
 
-    return Ok<MetaCheckResult>({ info, resolved });
+    return Ok<MetaCheckResult>({ info.m_id, resolved });
 }

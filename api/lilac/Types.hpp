@@ -184,6 +184,9 @@ namespace lilac {
         Resolved,
         // Mod is loaded
         Loaded,
+		// Mod is loaded, however it is also 
+		// disabled and therefore can't be used
+		Disabled,
     };
 
 	/**

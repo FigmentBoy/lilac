@@ -47,15 +47,19 @@ Mod* loadWithCApi(HMODULE load) {
     return nullptr;
 }
 
-Result<Mod*> Loader::loadModFromFile(std::string const& path) {
-    auto check = this->checkMetaInformation(path);
-    if (!check) {
-        return check;
+Result<Mod*> Loader::loadResolvedMod(std::string const& id) {
+    auto ix = this->m_unresolvedMods.begin();
+    ModInfo info;
+    for (auto const& mod : this->m_unresolvedMods) {
+        if (mod->m_info.m_id == id) {
+            info = mod->m_info;
+        } else { ix++; }
     }
-    if (!check.value().resolved) {
-        return Ok<Mod*>(nullptr);
+    if (ix == this->m_unresolvedMods.end()) {
+        return Err<>("Mod with the ID of " + id + " has not been loaded");
     }
-    auto load = LoadLibraryA(path.c_str());
+    this->m_unresolvedMods.erase(ix);
+    auto load = LoadLibraryA(info.m_path.c_str());
     if (load) {
         Mod* mod = nullptr;
 
@@ -70,14 +74,25 @@ Result<Mod*> Loader::loadModFromFile(std::string const& path) {
             mod->setup();
             mod->m_enabled = true;
             mod->m_platformInfo = new PlatformInfo { load };
-            mod->m_info = check.value().info;
+            mod->m_info = info;
             this->m_mods.push_back(mod);
             return Ok<Mod*>(mod);
         } else {
-            return Err<>("Unable to find load functions within " + path);
+            return Err<>("Unable to find load functions for " + info.m_id);
         }
     }
-    return Err<>("Unable to load the DLL from \"" + path + "\"");
+    return Err<>("Unable to load the DLL for \"" + info.m_id + "\"");
+}
+
+Result<Mod*> Loader::loadModFromFile(std::string const& path) {
+    auto check = this->checkMetaInformation(path);
+    if (!check) {
+        return check;
+    }
+    if (!check.value().resolved) {
+        return Ok<Mod*>(nullptr);
+    }
+    return this->loadResolvedMod(check.value().id);
 }
 
 #endif
