@@ -14,6 +14,14 @@ Mod::~Mod() {
     for (auto const& hook : this->m_hooks) {
         this->removeHook(hook);
     }
+    for (auto const& patch : this->m_patches) {
+        patch->restore();
+        vector_utils::erase<Patch*>(this->m_patches, patch);
+        delete patch;
+    }
+    for (auto const& dep : this->m_info.m_dependencies) {
+        vector_utils::erase(dep.m_loaded->m_parentDependencies, this);
+    }
 }
 
 void Mod::setup() {}

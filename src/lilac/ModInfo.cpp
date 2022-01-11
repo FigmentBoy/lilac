@@ -31,10 +31,10 @@ void ModInfo::updateDependencyStates() {
 
 bool ModInfo::hasUnresolvedDependencies() const {
 	for (auto const& dep : this->m_dependencies) {
-		if (
+		if (dep.m_required && (
 			dep.m_state == ModResolveState::Unloaded ||
 			dep.m_state == ModResolveState::Unresolved
-		) {
+		)) {
 			return false;
 		}
 	}

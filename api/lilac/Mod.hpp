@@ -20,6 +20,7 @@ namespace lilac {
     struct PlatformInfo;
 
     class Hook;
+    class Patch;
     class Loader;
     class LogStream;
     class Mod;
@@ -132,6 +133,10 @@ namespace lilac {
          */
         std::vector<Hook*> m_hooks;
         /**
+         * Patches owned by this mod
+         */
+        std::vector<Patch*> m_patches;
+        /**
          * Whether the mod is enabled or not
          */
         bool m_enabled;
@@ -139,6 +144,13 @@ namespace lilac {
          * Mod info
          */
         ModInfo m_info;
+        /**
+         * Pointers to mods that depend on 
+         * this Mod. Makes it possible to 
+         * enable / disable them automatically, 
+         * when their dependency is disabled.
+         */
+        std::vector<Mod*> m_parentDependencies;
 
         /**
          * Cleanup platform-related info
@@ -313,6 +325,22 @@ namespace lilac {
          * errorful result with info on error
          */
         Result<> removeHook(Hook* hook);
+
+        /**
+         * Write a patch at an address
+         * @param address The address to write into
+         * @param data The data to write there
+         * @returns Successful result on success, 
+         * errorful result with info on error
+         */
+        Result<Patch*> patch(void* address, byte_array data);
+
+        /**
+         * Remove a patch owned by this Mod
+         * @returns Successful result on success, 
+         * errorful result with info on error
+         */
+        Result<> unpatch(Patch* patch);
 
         /**
          * Check whether or not this Mod

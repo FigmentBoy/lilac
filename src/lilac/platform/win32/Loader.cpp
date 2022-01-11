@@ -76,6 +76,9 @@ Result<Mod*> Loader::loadResolvedMod(std::string const& id) {
             mod->m_platformInfo = new PlatformInfo { load };
             mod->m_info = info;
             this->m_mods.push_back(mod);
+            for (auto const& dep : mod->m_info.m_dependencies) {
+                dep.m_loaded->m_parentDependencies.push_back(mod);
+            }
             return Ok<Mod*>(mod);
         } else {
             return Err<>("Unable to find load functions for " + info.m_id);
