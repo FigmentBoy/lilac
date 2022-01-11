@@ -4,6 +4,7 @@
 #include <Log.hpp>
 #include <Loader.hpp>
 #include <utils/utils.hpp>
+#include <Internal.hpp>
 
 USE_LILAC_NAMESPACE();
 
@@ -97,11 +98,19 @@ void Mod::throwError(
     std::string_view const& info,
     Severity severity
 ) {
-    Loader::get()->log(new LogMessage(
+    auto log = new LogMessage(
         std::string(info),
         severity,
         this
-    ));
+    );
+    Loader::get()->log(log);
+    #ifdef LILAC_PLATFORM_CONSOLE
+    if (Lilac::get()->platformConsoleReady()) {
+        std::cout << log->toString(true) << "\n";
+    } else {
+        Lilac::get()->queueConsoleMessage(log);
+    }
+    #endif
 }
 
 bool Mod::addKeybindAction(

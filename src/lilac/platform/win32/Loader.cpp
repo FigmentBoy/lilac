@@ -5,6 +5,7 @@
 #include <CApiMod.hpp>
 #include <InternalMod.hpp>
 #include <Log.hpp>
+#include <ZipUtils.h>
 
 #ifdef LILAC_IS_WINDOWS
 
@@ -56,7 +57,42 @@ Result<Mod*> Loader::loadResolvedMod(std::string const& id) {
         return Err<>("Mod with the ID of " + id + " has not been loaded");
     }
     this->m_unresolvedMods.erase(ix);
-    auto load = LoadLibraryA(info.m_path.c_str());
+
+    auto unzip = ZipFile::ZipFile(info.m_path);
+
+    if (!unzip.isLoaded()) {
+        return Err<>("Unable to re-read zip for \"" + id + "\"");
+    }
+
+    if (!unzip.fileExists(info.m_binaryName)) {
+        return Err<>(
+            "Unable to find platform binary under the name \"" +
+            info.m_binaryName + "\" in \"" + id + "\""
+        );
+    }
+
+    auto tempDir = const_join_path_c_str<lilac_directory, lilac_temp_directory>;
+    if (!std::filesystem::exists(tempDir)) {
+        auto dir = file_utils::createDirectory(tempDir);
+        if (!dir) return Err<>(dir.error());
+    }
+    
+    unsigned long size;
+    auto data = unzip.getFileData(info.m_binaryName, &size);
+    if (!data || !size) {
+        return Err<>("Unable to read \"" + info.m_binaryName + "\" for \"" + id + "\"");
+    }
+    
+    static long long g_tempID = 0;
+
+    auto tempPath = 
+        std::filesystem::path(lilac_directory) / 
+        lilac_temp_directory / 
+        ("mod_" + std::to_string(g_tempID++) + ".dll");
+    auto wrt = file_utils::writeBinary(tempPath, byte_array(data, data + size));
+    if (!wrt) return Err<>(wrt.error());
+
+    auto load = LoadLibraryA(tempPath.string().c_str());
     if (load) {
         Mod* mod = nullptr;
 
@@ -85,18 +121,13 @@ Result<Mod*> Loader::loadResolvedMod(std::string const& id) {
 }
 
 Result<Mod*> Loader::loadModFromFile(std::string const& path) {
-    InternalMod::get()->log() << "checking meta for " << path << lilac::endl;
     auto check = this->checkMetaInformation(path);
-    InternalMod::get()->log() << "checked meta for " << path << lilac::endl;
     if (!check) {
-        InternalMod::get()->log() << "Meta was shit: " << check.error() << lilac::endl;
         return Err<>(check.error());
     }
     if (!check.value().resolved) {
-        InternalMod::get()->log() << "not resolved: " << check.error() << lilac::endl;
         return Ok<Mod*>(nullptr);
     }
-    InternalMod::get()->log() << "loaded " << check.value().id << lilac::endl;
     return this->loadResolvedMod(check.value().id);
 }
 

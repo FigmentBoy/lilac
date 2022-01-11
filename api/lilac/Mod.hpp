@@ -39,6 +39,13 @@ namespace lilac {
          */
         std::string m_path;
         /**
+         * Name of the platform binary within 
+         * the mod zip
+         */
+        std::string m_binaryName = LILAC_WINDOWS("mod.dll")
+                                   LILAC_MACOS("mod.dylib")
+                                   LILAC_ANDROID("mod.so");
+        /**
          * Mod Version. Should follow semver.
          */
         VersionInfo m_version { 1, 0, 0 };

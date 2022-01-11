@@ -18,3 +18,4 @@ target_link_libraries(
     lilac_loader
 )
 
+create_lilac_file(${PROJECT_NAME})

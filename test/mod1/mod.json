@@ -7,5 +7,6 @@
     "description":  "Test Mod #1",
     "details":      "Test Mod #1 for making sure hooking, loading and sharing interfaces works.",
     "credits":      null,
-	"dependencies": null
+	"dependencies": null,
+    "windowsBinary":"TestMod1.dll"
 }

@@ -14,6 +14,7 @@ namespace lilac {
     static constexpr const std::string_view lilac_directory          = "lilac";
     static constexpr const std::string_view lilac_mod_directory      = "mods";
     static constexpr const std::string_view lilac_resource_directory = "resources";
+    static constexpr const std::string_view lilac_temp_directory     = "temp";
     static constexpr const std::string_view lilac_mod_extension      = ".lilac";
 
     class Mod;

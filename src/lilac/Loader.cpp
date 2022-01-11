@@ -17,6 +17,7 @@ void Loader::createDirectories() {
     file_utils::createDirectory(const_join_path_c_str<lilac_directory>);
     file_utils::createDirectory(const_join_path_c_str<lilac_directory, lilac_resource_directory>);
     file_utils::createDirectory(const_join_path_c_str<lilac_directory, lilac_mod_directory>);
+    std::filesystem::remove_all(const_join_path_c_str<lilac_directory, lilac_temp_directory>);
 }
 
 size_t Loader::updateMods() {
@@ -138,6 +139,7 @@ Loader::~Loader() {
         delete log;
     }
     delete this->m_logStream;
+    std::filesystem::remove_all(const_join_path<lilac_directory, lilac_temp_directory>);
 }
 
 LogStream& Loader::logStream() {
