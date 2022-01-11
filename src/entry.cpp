@@ -71,12 +71,9 @@ BOOL WINAPI DllMain(
 ) {
     switch (fdwReason) {
         case DLL_PROCESS_ATTACH:
-
-            // not sure why this is here.
-            // i just saw other mods doing it
-            // and thought "sure".
-            // if someone does know, please update
-            // these comments.
+            // Prevents threads from notifying this DLL on creation or destruction.
+            // Kind of redundant for a game that isn't multi-threaded but will provide
+            // some slight optimizations if a mod frequently creates and deletes threads.
             DisableThreadLibraryCalls(hModule);
 
             // loading thread
