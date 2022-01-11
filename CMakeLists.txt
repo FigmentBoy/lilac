@@ -21,12 +21,6 @@ target_link_libraries(
 	lilac_lib
 )
 
-if(DEBUG)
-	target_link_libraries(lilac_loader staticZipperd)
-else()
-	target_link_libraries(lilac_loader staticZipper)
-endif()
-
 target_include_directories(
 	lilac_loader PUBLIC
 	"${CMAKE_SOURCE_DIR}/api"
@@ -36,7 +30,6 @@ target_include_directories(
 	"${CMAKE_SOURCE_DIR}/src"
 	"${CMAKE_SOURCE_DIR}/src/lilac"
 	"${CMAKE_SOURCE_DIR}/src/lilac/internal"
-	"${CMAKE_SOURCE_DIR}/submodules/zipper/zipper"
 	"${CMAKE_SOURCE_DIR}/submodules/json"
 )
 

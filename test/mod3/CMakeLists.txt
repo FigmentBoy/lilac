@@ -6,7 +6,7 @@ set(PROJECT_NAME TestMod3)
 
 project(${PROJECT_NAME} VERSION 1.0.0)
 
-add_library(${PROJECT_NAME} SHARED mod3.cpp)
+add_library(${PROJECT_NAME} SHARED mod3.c)
 
 remove_definitions(-D_EXPORTING_LILAC_MOD)
 

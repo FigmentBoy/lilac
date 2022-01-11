@@ -2,8 +2,8 @@
 
 #include <utils/include.hpp>
 
-#define LILAC_C_API \
-    extern "C" __declspec(dllexport)
+// Disable Dll-Interface warnings
+#pragma warning(disable: 4251)
 
 // Macros for making default functions for mods
 #define LILAC_LOAD(_modName_) \

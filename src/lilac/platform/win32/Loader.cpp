@@ -20,17 +20,15 @@ USE_LILAC_NAMESPACE();
     }
 
 Mod* loadWithCApi(HMODULE load) {
-    TRY_C_AND_MANGLED(loadFunc, lilac_c_load, "lilac_c_load", "_lilac_c_load@4");
+    TRY_C_AND_MANGLED(loadFunc, lilac_c_load, "lilac_c_load", "_lilac_c_load@0");
 
     if (loadFunc) {
-        auto info = new CModInfo;
-        auto err = loadFunc(info);
+        auto err = loadFunc();
         if (err) {
             // todo: log error in internal plugin
-            delete info;
             return nullptr;
         }
-        auto mod = new CApiMod(info);
+        auto mod = new CApiMod();
 
         TRY_C_AND_MANGLED(unloadFunc, lilac_c_unload, "lilac_c_unload", "_lilac_c_unload@0");
         TRY_C_AND_MANGLED(enableFunc, lilac_c_enable, "lilac_c_enable", "_lilac_c_enable@0");
@@ -41,7 +39,6 @@ Mod* loadWithCApi(HMODULE load) {
         mod->m_enableFunc   = enableFunc;
         mod->m_disableFunc  = disableFunc;
 
-        delete info;
         return mod;
     }
     return nullptr;
@@ -88,13 +85,18 @@ Result<Mod*> Loader::loadResolvedMod(std::string const& id) {
 }
 
 Result<Mod*> Loader::loadModFromFile(std::string const& path) {
+    InternalMod::get()->log() << "checking meta for " << path << lilac::endl;
     auto check = this->checkMetaInformation(path);
+    InternalMod::get()->log() << "checked meta for " << path << lilac::endl;
     if (!check) {
-        return check;
+        InternalMod::get()->log() << "Meta was shit: " << check.error() << lilac::endl;
+        return Err<>(check.error());
     }
     if (!check.value().resolved) {
+        InternalMod::get()->log() << "not resolved: " << check.error() << lilac::endl;
         return Ok<Mod*>(nullptr);
     }
+    InternalMod::get()->log() << "loaded " << check.value().id << lilac::endl;
     return this->loadResolvedMod(check.value().id);
 }
 

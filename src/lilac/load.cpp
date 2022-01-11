@@ -9,23 +9,37 @@
 
 USE_LILAC_NAMESPACE();
 
+template<> Result<Loader::MetaCheckResult> Loader::checkBySchema<1>(std::string const& path, void* jsonData);
+
 Result<Loader::MetaCheckResult> Loader::checkMetaInformation(std::string const& path) {
+    InternalMod::get()->log() << "unzipping " << path << lilac::endl;
     // Unzip file
     auto unzip = ZipFile::ZipFile(path);
     if (!unzip.isLoaded()) {
+        InternalMod::get()->log() << "not unzipped " << path << lilac::endl;
         return Err<>("\"" + path + "\": Unable to unzip");
     }
     // Check if mod.json exists in zip
     if (!unzip.fileExists("mod.json")) {
         return Err<>("\"" + path + "\" is missing mod.json");
     }
+    InternalMod::get()->log() << "reading mod.json for " << path << lilac::endl;
     // Read mod.json & parse if possible
     auto read = unzip.getFileData("mod.json", nullptr);
     if (!read) {
+        InternalMod::get()->log() << "actually not reading mod.json for " << path << lilac::endl;
         return Err<>("\"" + path + "\": Unable to read mod.json");
     }
-    auto json = nlohmann::json::parse(read);
+    InternalMod::get()->log() << "parsing mod.json for " << path << lilac::endl;
+    nlohmann::json json;
+    try { json = nlohmann::json::parse(read); }
+    catch(nlohmann::json::parse_error const& e) {
+        return Err<>("\"" + path + "\": Unable to parse mod.json - \"" + e.what() + "\"");
+    } catch(...) {
+        return Err<>("\"" + path + "\": Unable to parse mod.json - Unknown Error");
+    }
     // Free up memory
+    InternalMod::get()->log() << "freeing memory for " << path << lilac::endl;
     delete[] read;
     if (!json.is_object()) {
         return Err<>(
@@ -33,6 +47,7 @@ Result<Loader::MetaCheckResult> Loader::checkMetaInformation(std::string const& 
             "object at root despite expected"
         );
     }
+    InternalMod::get()->log() << "checkig mod json for " << path << lilac::endl;
 
     // Check mod.json target version
     auto schema = 1;

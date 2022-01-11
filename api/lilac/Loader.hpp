@@ -14,9 +14,7 @@ namespace lilac {
     static constexpr const std::string_view lilac_directory          = "lilac";
     static constexpr const std::string_view lilac_mod_directory      = "mods";
     static constexpr const std::string_view lilac_resource_directory = "resources";
-    static constexpr const std::string_view lilac_mod_extension      = LILAC_WINDOWS(".dll")
-                                                                       LILAC_MACOS(".dylib")
-                                                                       LILAC_ANDROID(".so");
+    static constexpr const std::string_view lilac_mod_extension      = ".lilac";
 
     class Mod;
     class Hook;
@@ -88,7 +86,7 @@ namespace lilac {
         friend class Mod;
         friend class CustomLoader;
         friend class Lilac;
-        friend class ModInfo;
+        friend struct ModInfo;
         
     public:
         static Loader* get();

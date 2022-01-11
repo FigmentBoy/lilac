@@ -11,12 +11,9 @@
 #include <unordered_map>
 
 class Lilac;
+class InternalMod;
 
-namespace lilac {
-    #pragma warning(disable: 4251) // I will use unordered_map and
-                                   // no amount of compiler warnings
-                                   // can stop me >:)
-                                   
+namespace lilac {                  
     struct PlatformInfo;
 
     class Hook;
@@ -169,6 +166,8 @@ namespace lilac {
          * been loaded or not
          */
         bool hasUnresolvedDependencies() const;
+
+        friend class InternalMod;
         
         /**
          * Low-level add hook
@@ -192,6 +191,10 @@ namespace lilac {
     private:
         void disableBase();
         void enableBase();
+
+        void setupInternal();
+
+        friend class InternalMod;
 
     protected:
         /**

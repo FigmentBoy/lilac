@@ -22,7 +22,6 @@ class CApiMod : public Mod {
         virtual ~CApiMod();
 
     public:
-        CApiMod() = delete;
-        CApiMod(CModInfo*);
+        CApiMod();
 };
 

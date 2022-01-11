@@ -1,7 +1,7 @@
 #include "CApiMod.hpp"
 
 #define ASSIGN_FROM_CMI(member) \
-    if (info->member) this->m_##member = info->member;
+    if (info->member) this->m_info.m_##member = info->member;
 
 void CApiMod::setup() {}
 
@@ -23,14 +23,6 @@ CApiMod::~CApiMod() {
     }
 }
 
-CApiMod::CApiMod(CModInfo* info) {
+CApiMod::CApiMod() {
     this->setup();
-
-    ASSIGN_FROM_CMI(version);
-    ASSIGN_FROM_CMI(id);
-    ASSIGN_FROM_CMI(name);
-    ASSIGN_FROM_CMI(developer);
-    ASSIGN_FROM_CMI(description);
-    ASSIGN_FROM_CMI(details);
-    ASSIGN_FROM_CMI(credits);
 }

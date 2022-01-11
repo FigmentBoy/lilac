@@ -12,6 +12,8 @@ class InternalMod : public Mod {
 
         friend class Lilac;
 
+        InternalMod();
+
     public:
         static InternalMod* get();
 };

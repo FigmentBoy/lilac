@@ -47,6 +47,8 @@ size_t Loader::updateMods() {
                 auto res = this->loadModFromFile(entry.path().string());
                 if (res) {
                     loaded++;
+                    InternalMod::get()->log()
+                        << "Succesfully loaded \"" << res.value() << lilac::endl;
                 } else {
                     InternalMod::get()->throwError(res.error(), Severity::Error);
                 }
